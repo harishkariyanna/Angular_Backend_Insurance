@@ -12,10 +12,10 @@ public class AppDbContext : DbContext
     public DbSet<Claim> Claims { get; set; }
     public DbSet<Upload> Uploads { get; set; }
     public DbSet<PolicyApplication> PolicyApplications { get; set; }
+    public DbSet<Review> Reviews { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Configure relationships to avoid cascade conflicts
         modelBuilder.Entity<Claim>()
             .HasOne(c => c.PolicyApplication)
             .WithMany()
@@ -40,6 +40,5 @@ public class AppDbContext : DbContext
             .HasForeignKey(pa => pa.AgentId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        // Seed data removed to avoid migration issues
     }
 }

@@ -48,8 +48,8 @@ public class AgentsController : ControllerBase
             Email = dto.Email,
             Password = dto.Password,
             Role = "Agent",
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")),
+            UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"))
         };
 
         _context.Users.Add(agent);
@@ -69,7 +69,7 @@ public class AgentsController : ControllerBase
 
         agent.Name = dto.Name;
         agent.Email = dto.Email;
-        agent.UpdatedAt = DateTime.UtcNow;
+        agent.UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
 
         await _context.SaveChangesAsync();
         return Ok(new { message = "Agent updated successfully" });

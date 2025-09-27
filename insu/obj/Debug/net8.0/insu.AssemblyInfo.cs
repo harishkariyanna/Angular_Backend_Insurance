@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("insu")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4f35149456b02429d4525c5d7ed1529963c0814f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3dba462423ffaa4db43d615610972a992298eccf")]
 [assembly: System.Reflection.AssemblyProductAttribute("insu")]
 [assembly: System.Reflection.AssemblyTitleAttribute("insu")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -23,13 +23,9 @@ public class ClaimsController : ControllerBase
     public async Task<ActionResult<IEnumerable<insu.Models.Claim>>> GetClaims()
     {
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-        var isAdmin = User.IsInRole("Admin");
-
         var query = _context.Claims.Include(c => c.User).Include(c => c.PolicyApplication).ThenInclude(pa => pa.Policy);
-        
-        if (User.IsInRole("Admin"))
-            return await query.ToListAsync();
-        else if (User.IsInRole("Agent"))
+
+        if (User.IsInRole("Agent"))
             return await query.Where(c => c.PolicyApplication.AgentId == userId).ToListAsync();
         else
             return await query.Where(c => c.UserId == userId).ToListAsync();
@@ -52,11 +48,11 @@ public class ClaimsController : ControllerBase
     public async Task<ActionResult<insu.Models.Claim>> CreateClaim(CreateClaimDto dto)
     {
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-        
+
         // Check if user has approved application for this policy
         var approvedApp = await _context.PolicyApplications
             .FirstOrDefaultAsync(pa => pa.Id == dto.PolicyApplicationId && pa.UserId == userId && pa.Status == "Approved");
-            
+
         if (approvedApp == null)
             return BadRequest("You can only claim on approved policies");
 
@@ -68,7 +64,7 @@ public class ClaimsController : ControllerBase
             UserId = userId,
             PolicyApplicationId = dto.PolicyApplicationId
         };
-        
+
         _context.Claims.Add(claim);
         await _context.SaveChangesAsync();
         return CreatedAtAction(nameof(GetClaim), new { id = claim.Id }, claim);
@@ -86,7 +82,7 @@ public class ClaimsController : ControllerBase
         if (!User.IsInRole("Admin") && existingClaim.UserId != userId)
             return Forbid();
 
-        claim.UpdatedAt = DateTime.UtcNow;
+        claim.UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
         _context.Entry(existingClaim).CurrentValues.SetValues(claim);
         await _context.SaveChangesAsync();
         return NoContent();
@@ -108,14 +104,18 @@ public class ClaimsController : ControllerBase
     }
 
     [HttpPut("{id}/approve")]
-    [Authorize(Roles = "Admin,Agent")]
+    [Authorize(Roles = "Agent")]
     public async Task<IActionResult> ApproveClaim(int id, ClaimApprovalDto dto)
     {
-        var claim = await _context.Claims.FindAsync(id);
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        var claim = await _context.Claims.Include(c => c.PolicyApplication).FirstOrDefaultAsync(c => c.Id == id);
         if (claim == null) return NotFound();
 
+        if (claim.PolicyApplication.AgentId != userId)
+            return Forbid();
+
         claim.Status = dto.Status;
-        claim.UpdatedAt = DateTime.UtcNow;
+        claim.UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
         await _context.SaveChangesAsync();
         return NoContent();
     }

@@ -3,31 +3,29 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using insu.Data;
-using Microsoft.OpenApi.Models; // ✅ Make sure this is imported
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllers();
 
-// ✅ Correct Swagger/OpenAPI configuration
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo  // ✅ Using Microsoft.OpenApi.Models.OpenApiInfo
+    c.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "Insurance API",
         Version = "v1",
         Description = "Insurance Policy Management System API"
     });
 
-    // ✅ Add Bearer auth support
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
         Name = "Authorization",
         In = ParameterLocation.Header,
-        Type = SecuritySchemeType.Http, // ✅ Use Http for Bearer tokens
+        Type = SecuritySchemeType.Http,
         Scheme = "bearer"
     });
 
